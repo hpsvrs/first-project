@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@mui/icons-material": "^5.4.1",
+    "install": "^0.13.0",
+    "npm": "^8.5.1",
+    "react-router-dom": "^6.2.1",
+    "sass": "^1.49.9"
+  }
+}
