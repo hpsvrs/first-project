@@ -125,9 +125,8 @@ export const PreSaleForm = ({ token }: StakeFormProps) => {
                 autoHideDuration={5000}
                 onClose={handleCloseSnack} >
                 <Alert onClose={handleCloseSnack} severity="success" >
-                    Tokens Staked!
+                    Tokens Purchased!
                 </Alert>
-
             </Snackbar>
         </>
     )

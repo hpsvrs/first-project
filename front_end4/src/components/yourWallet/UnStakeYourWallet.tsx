@@ -7,6 +7,7 @@ import { Button, Tab } from "@material-ui/core"
 import { WalletBalance } from "./WalletBalance";
 import { UnStakeForm } from "./UnStakeForm"
 import { makeStyles } from "@material-ui/core"
+import { CheckpointsPreSale } from "../CheckpointsPreSale";
 
 const useStyles = makeStyles((theme) => ({
     tabContent: {
@@ -18,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
     box: {
         backgroundColor: "white",
         borderRadius: "25px",
-        opacity: "0.95"
+        opacity: "0.95",
     },
     header: {
         color: "white"
@@ -49,6 +50,8 @@ export const UnStakeYourWallet = ({ supportedTokens }: YourWalletProps) => {
             {/* {(number < 25) ? (<Button onClick={(() => setNumber(number + 2))}>Less {number}</Button>) : (number >= 25 && number <= 30)
                 ? (<Button onClick={changeNumber}>greater {number}</Button>) : (<Button onClick={changeNumber}>greatest {number}</Button>)}
             <Button onClick={changeNumber}>Click Here {number}</Button> */}
+            {/* <CheckpointsPreSale /> */}
+
             <Box className={classes.box}>
                 <TabContext value={selectedTokenIndex.toString()} >
                     <TabList onChange={handleChange} aria-label="stake form tabs">

@@ -55,6 +55,7 @@ export const UnStakeForm = ({ token }: StakeFormProps) => {
     const isMining = approveAndStakeErc20State.status === "Mining"
     const isUnStaking = unstakeTokensState.status === "Mining"
     const isUnStakingAll = unstakeAllTokensState.status === "Mining"
+    const [btnDisable, setBtnDisable] = useState('')
     console.log(isUnStaking)
 
     // const isUnStaking = unstakeTokensState.status = "UnStakings"
@@ -67,6 +68,15 @@ export const UnStakeForm = ({ token }: StakeFormProps) => {
         setShowStakeTokensSuccess(false)
         setShowUnStakeTokensSuccess(false)
     }
+
+    useEffect(() => {
+        if (isMining || isUnStaking || isUnStakingAll) {
+            setBtnDisable('disabled')
+        } else {
+            setBtnDisable('')
+        }
+    }, [isMining, isUnStaking, isUnStakingAll])
+
     useEffect(() => {
         if (notifications.filter((notification) =>
             notification.type === "transactionSucceed" &&
@@ -121,10 +131,9 @@ export const UnStakeForm = ({ token }: StakeFormProps) => {
                 </button>
                 <div>
                     <button className="btn" onClick={handleUnStakeAllSubmit}
-
                         disabled={isUnStaking || isUnStakingAll}
                     >
-                        {isUnStakingAll ? <CircularProgress size={26} /> : "Unstake All!!"}
+                        {(isUnStaking) ? <CircularProgress size={26} /> : "Unstake All!!"}
 
                     </button>
                 </div>

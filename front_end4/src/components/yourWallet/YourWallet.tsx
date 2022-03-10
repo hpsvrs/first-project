@@ -7,6 +7,8 @@ import { Tab } from "@material-ui/core"
 import { WalletBalance } from "./WalletBalance";
 import { StakeForm } from "./StakeForm"
 import { makeStyles } from "@material-ui/core"
+import { CheckpointsPreSale } from "../CheckpointsPreSale";
+
 
 const useStyles = makeStyles((theme) => ({
     tabContent: {
@@ -19,6 +21,7 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "white",
         borderRadius: "25px",
         opacity: "0.95",
+        marginTop: "1em",
     },
     header: {
         color: "white"
@@ -43,6 +46,8 @@ export const YourWallet = ({ supportedTokens }: YourWalletProps) => {
     const classes = useStyles()
     return (
         <Box className="" sx={{ mt: 4 }}>
+            <CheckpointsPreSale />
+
             <Box className={classes.box}>
                 <TabContext value={selectedTokenIndex.toString()}>
                     <TabList onChange={handleChange} aria-label="stake form tabs">

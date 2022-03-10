@@ -89,11 +89,16 @@ export const CompleteGridPurchasedPreSaleBalance = ({ tokenAddress }: BalanceMsg
                             </h3>
                         </Item>
                     </Grid>
+                    <div >
+
+                    </div>
 
                     <Grid item xs={12} md={12}>
-                        <Item sx={{ backgroundColor: '#B9B8B8' }}>
+                        <h1 className="section-heading"> Claim Pre-Sale Tokens...</h1>
+
+                        {/* <Item sx={{ backgroundColor: 'black', color: 'white', opacity: '0.5' }}>
                             <h2>Withdraw Pre Sale Tokens</h2>
-                        </Item>
+                        </Item> */}
                         {/* <Item> */}
 
 

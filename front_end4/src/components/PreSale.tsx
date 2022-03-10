@@ -88,12 +88,10 @@ export const PreSale = ({ supportedTokens }: YourWalletProps) => {
 
             <CompleteGridPurchasedPreSaleBalance tokenAddress={dappTokenAddress} />
 
-            <CheckpointsPreSale connectedToMetaMask={connectedToMetaMask}
-                ethBalance={formattedEthBalance}
-                busdBalance={formattedBusdTokenBalance} />
+            <CheckpointsPreSale />
 
             {/* <h2 className={classes.header}><span className={classes.spanparticipation}>Participation...</span></h2> */}
-            <h1 className="section-heading"> Participation...</h1>
+            <h1 className="section-heading"> Participate...</h1>
             {(connectedToMetaMask && (formattedEthBalance > 0)
                 && (formattedBusdTokenBalance == 0)) ? (
                 <Box className={classes.box}>

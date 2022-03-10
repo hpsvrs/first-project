@@ -12,6 +12,12 @@ import LocalPoliceIcon from '@mui/icons-material/LocalPolice';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import CheckIcon from '@mui/icons-material/Check';
 import { deepOrange, green } from '@mui/material/colors';
+import { ProgressBar } from "./ProgressBar";
+import { useEthers, useTokenBalance, useEtherBalance } from "@usedapp/core"
+import { formatUnits } from "@ethersproject/units"
+import { useEffect, useState } from "react";
+
+
 
 const useStyles = makeStyles(theme => ({
     container: {
@@ -61,9 +67,9 @@ const Item2 = styled(Paper)(({ theme }) => ({
     backgroundColor: 'rgba(52, 52, 52, 0.8)',
     paddingTop: theme.spacing(1),
     textAlign: 'center',
-
+    opacity: '.5',
     justifyContent: 'center',
-    display: 'flex'
+    display: 'flex',
     // color: theme.palette.text.secondary,
 }));
 
@@ -73,12 +79,31 @@ interface CheckpointProps {
     busdBalance: number
 }
 
-export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalance }: CheckpointProps) => {
+export const CheckpointsPreSale = () => {
     console.log("CheckpointsPreSale")
     const classes = useStyles()
     // console.log(connectedToMetaMask)
+    const { account } = useEthers()
 
-    const ethAvailable = (ethBalance > 0) ? true : false
+    const connectedToMetaMask = account !== undefined
+
+    const busdTokenAddress = '0x4Fabb145d64652a948d72533023f6E7A623C7C53'
+
+    const busdTokenBalance = useTokenBalance(busdTokenAddress, account)
+    const formattedBusdTokenBalance: number = busdTokenBalance ? parseFloat(formatUnits(busdTokenBalance, 18)) : 0
+
+    const ethBalance = useEtherBalance(account)
+    const formattedEthBalance: number = ethBalance ? parseFloat(formatUnits(ethBalance, 18)) : 0
+
+    const ethAvailable = (formattedEthBalance > 0) ? true : false
+    const [checkpoints, setCheckpoints] = useState(false)
+
+    useEffect(() => {
+        if (connectedToMetaMask && ethAvailable) {
+            setCheckpoints(true)
+        }
+    }, [connectedToMetaMask, ethAvailable])
+
     return (
         <>
             <Box sx={{ flexGrow: 1 }}>
@@ -140,7 +165,7 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
                 <Grid item className="checkpointsGridItem" xs={12} md={4}
                     sx={{ display: { xs: 'block', sm: 'block' }, }}
                 >
-                    {ethBalance ? (
+                    {formattedEthBalance ? (
                         <>
                             <Item sx={{ backgroundColor: '#B9B8B8', fontWeight: '900' }}>
 
@@ -150,7 +175,7 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
                             </Item>
                             <Item >
 
-                                <h3>Your Bnb Balance: <span>{ethBalance}</span></h3>
+                                <h3>Your Bnb Balance: <span>{formattedEthBalance}</span></h3>
                             </Item>
                         </>
                     ) : (
@@ -161,12 +186,12 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
                                 <CheckBoxOutlineBlankIcon />
                             </Item>
                             <Item >
-                                <h3>BNB Balance: <span>{ethBalance}</span></h3>
+                                <h3>BNB Balance: <span>{formattedEthBalance}</span></h3>
                             </Item>
                         </>)}
                 </Grid>
                 <Grid item className="checkpointsGridItem" xs={12} md={4}>
-                    {busdBalance ? (
+                    {formattedBusdTokenBalance ? (
                         <>
                             <Item sx={{ backgroundColor: '#B9B8B8', fontWeight: '900' }}>
                                 <h2> BUSD Available</h2>
@@ -174,7 +199,7 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
 
                             </Item>
                             <Item >
-                                <h3>Your BUSD Balance: <span>{busdBalance}</span></h3>
+                                <h3>Your BUSD Balance: <span>{formattedBusdTokenBalance}</span></h3>
                             </Item>
                         </>
                     ) : (
@@ -186,7 +211,7 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
                             </Item>
                             <Item >
 
-                                <h3>Your BUSD Balance: <span>{busdBalance}</span></h3>
+                                <h3>Your BUSD Balance: <span>{formattedBusdTokenBalance}</span></h3>
 
                             </Item>
                         </>)}
@@ -194,53 +219,7 @@ export const CheckpointsPreSale = ({ connectedToMetaMask, ethBalance, busdBalanc
             </Grid>
 
             <Box sx={{ flexGrow: 1, marginTop: 2 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={1} >
-                    </Grid>
-                    <Grid item xs={5} md={2}>
-                        <Item2>
-                            <Avatar sx={{ bgcolor: green[500] }}><MenuIcon fontSize="large" /></Avatar>
-                        </Item2>
-                        <Item2>
-                            <p style={{ color: "#EFF3E9" }}>1. Checkpoints</p>
-                        </Item2>
-                    </Grid>
-                    <Grid item xs={5} md={2}    >
-                        <Item2>
-                            <Avatar sx={{ bgcolor: green[500] }}><MonetizationOnIcon /></Avatar>
-                        </Item2>
-                        <Item2>
-                            <p style={{ color: "#EFF3E9" }}>2. Enter Amount</p>
-                        </Item2>
-                    </Grid>
-                    <Grid item xs={4} md={2}>
-                        <Item2>
-                            <Avatar sx={{ bgcolor: green[500] }}><PriceCheckIcon /></Avatar>
-                        </Item2>
-                        <Item2>
-                            <p style={{ color: "#EFF3E9" }}>3. Pre-authorize</p>
-                        </Item2>
-                    </Grid>
-                    <Grid item xs={4} md={2}>
-                        <Item2>
-                            <Avatar sx={{ bgcolor: green[500] }}><LocalPoliceIcon /></Avatar>
-                        </Item2>
-                        <Item2>
-                            <p style={{ color: "#EFF3E9" }}>4. Confirm</p>
-                        </Item2>
-                    </Grid>
-                    <Grid item xs={4} md={2}>
-                        <Item2>
-                            <Avatar sx={{ bgcolor: green[500] }}><CheckIcon /></Avatar>
-                        </Item2>
-                        <Item2>
-                            <p style={{ color: "#EFF3E9" }}>5. Success</p>
-                        </Item2>
-                    </Grid>
-                    <Grid item xs={1} sx={{ display: { xs: 'flex', md: 'none' } }}>
-                    </Grid>
-
-                </Grid>
+                <ProgressBar checkpoints={checkpoints} />
             </Box>
         </>)
 }
