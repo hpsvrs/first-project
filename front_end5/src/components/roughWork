@@ -1,0 +1,88 @@
+<Menu
+                                            id="menu-appbar"
+                                            anchorEl={anchorElNav}
+                                            anchorOrigin={{
+                                                vertical: 'bottom',
+                                                horizontal: 'left',
+                                            }}
+                                            keepMounted
+                                            transformOrigin={{
+                                                vertical: 'top',
+                                                horizontal: 'left',
+                                            }}
+                                            open={Boolean(anchorElNav)}
+                                            onClose={handleCloseNavMenu}
+                                            sx={{
+                                                display: { xs: 'block', md: 'none' },
+                                            }}
+                                            className="navMenu"
+                                        >
+                                            {pages.map((page, index) => (
+                                                <MenuItem key={page.name} onClick={(() => handleCloseNavMenu(index))}>
+
+                                                    <Typography textAlign="center">
+                                                        {/* <Link href={page.link} underline="none"> */}
+                                                        {page.name} a
+                                                        {/* </Link> */}
+                                                    </Typography>
+                                                </MenuItem>
+                                            ))}
+                                        </Menu>
+
+                                            {pages.map((page, index) => (
+                                                    <li><a>{page.name}</a></li>
+
+
+                                                ))}
+
+/// ------------------------
+
+Grid of  Progress Bar
+<Grid container spacing={2}>
+                    <Grid item xs={1} >
+                    </Grid>
+                    <Grid className="" item xs={2} md={2}>
+                        <Item2>
+                            <Avatar sx={{ bgcolor: green[500] }}><MenuIcon fontSize="large" /></Avatar>
+                        </Item2>
+                        <Item2>
+                            <p style={{ color: "" }}>1. Checkpoints</p>
+                        </Item2>
+                    </Grid>
+                    <Grid className="" item xs={2} md={2}    >
+                        <Item2>
+                            <Avatar sx={{ bgcolor: green[500] }}><MonetizationOnIcon /></Avatar>
+                        </Item2>
+                        <Item2>
+                            <p style={{ color: "#EFF3E9" }}>2. Enter Amount</p>
+                        </Item2>
+                    </Grid>
+                    <Grid className="" item xs={2} md={2}>
+                        <Item2>
+                            <Avatar sx={{ bgcolor: green[500] }}><PriceCheckIcon /></Avatar>
+                        </Item2>
+                        <Item2>
+                            <p style={{ color: "#EFF3E9" }}>3. Pre-authorize</p>
+                        </Item2>
+                    </Grid>
+                    <Grid className="" item xs={2} md={2}>
+                        <Item2>
+                            <Avatar sx={{ bgcolor: green[500] }}><LocalPoliceIcon /></Avatar>
+                        </Item2>
+                        <Item2>
+                            <p style={{ color: "#EFF3E9" }}>4. Confirm</p>
+                        </Item2>
+                    </Grid>
+                    <Grid item xs={2} md={2}>
+                        <Item2>
+                            <Avatar sx={{ bgcolor: green[500] }}><CheckIcon /></Avatar>
+                        </Item2>
+                        <Item2>
+                            <p style={{ color: "#EFF3E9" }}>5. Success</p>
+                        </Item2>
+                    </Grid>
+                    <Grid item xs={1} sx={{ display: { xs: 'flex', md: 'none' } }}>
+                    </Grid>
+
+                </Grid>
+s

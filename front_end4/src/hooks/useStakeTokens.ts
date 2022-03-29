@@ -5,7 +5,8 @@ import ERC20 from "../chain-info/contracts/MockERC20.json"
 import networkMapping from "../chain-info/deployments/map.json"
 import { constants, utils } from "ethers"
 import { Contract } from "@ethersproject/contracts"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useContext } from "react"
+import { MyContext } from "../components/Header2"
 
 
 export const useStakeTokens = (tokenAddress: string) => {
@@ -15,7 +16,11 @@ export const useStakeTokens = (tokenAddress: string) => {
     const { chainId } = useEthers()
     const { abi } = TokenFarm
 
-    const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
+    const data = useContext(MyContext)
+    const { chainIdentity, tokenFarmContractAddress: tokenFarmAddress } = data
+
+
+    // const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
     const tokenFarmInterface = new utils.Interface(abi)
     const tokenFarmContract = new Contract(tokenFarmAddress, tokenFarmInterface)
 

@@ -1,0 +1,214 @@
+(address => uint256)stakingLevel;
+
+(uint256 => uint256)stakingLevelWeight;
+
+(uint256 => uint256)stakingLevelUserCounter;
+
+
+
+
+stakingLevelWeight(0) = 0;
+stakingLevelWeight(1) = 1;
+stakingLevelWeight(2) = 2;
+stakingLevelWeight(3) = 3;
+stakingLevelWeight(4) = 4;
+stakingLevelWeight(5) = 5;
+stakingLevelWeight(6) = 6;
+stakingLevelWeight(7) = 7;
+stakingLevelWeight(8) = 8;
+stakingLevelWeight(9) = 9;
+stakingLevelWeight(10) = 10;
+stakingLevelWeight(11) = 15;
+stakingLevelWeight(12) = 20;
+stakingLevelWeight(13) = 25;
+stakingLevelWeight(14) = 30;
+stakingLevelWeight(15) = 35;
+stakingLevelWeight(16) = 40;
+stakingLevelWeight(17) = 45;
+stakingLevelWeight(18) = 50;
+stakingLevelWeight(19) = 60;
+stakingLevelWeight(20) = 70;
+stakingLevelWeight(21) = 80;
+stakingLevelWeight(22) = 90;
+stakingLevelWeight(23) = 100;
+stakingLevelWeight(24) = 110;
+stakingLevelWeight(25) = 120;
+stakingLevelWeight(26) = 130;
+stakingLevelWeight(27) = 140;
+stakingLevelWeight(28) = 150;
+
+
+uint256 totalPoolWeight;
+totalPoolWeight = for(uint256 i=1; i<29; i++) {
+
+    uint256 poolWeight = (stakingLevelWeight(i) * 
+                            stakingLevelUserCounter(i));
+
+    totalPoolWeight = totalPoolWeight + poolWeight;
+    };
+
+uint256 averagePoolWeight = (totalAmount / totalPoolWeight)
+uint256
+
+uint256 allocatedAmountToEachUser = 
+                    (stakingLevelWeight(stakingLevel(msg.sender)) * 
+                    stakingLevelUserCounter(stakingLevel(msg.sender)) * 
+                    averagePoolWeight) /
+                    stakingLevelUserCounter(stakingLevel(msg.sender))
+
+uint256 allocatedAmountToEachUser = 
+
+
+zero = 0
+a = 1
+b = 2
+c = 3
+d = 4
+e = 5
+f = 6
+g = 7
+h = 8
+i = 9
+j = 10
+k = 15
+l = 20
+m= 25
+n = 30
+o = 35
+p = 40
+q = 50
+r = 60
+s = 70
+t = 80
+u = 90
+v = 100
+w = 110
+x = 120
+y = 130
+z = 140
+zz = 150
+
+
+numberOfUsersA
+numberOfUsersB
+numberOfUsersC
+numberOfUsersD
+numberOfUsersE
+numberOfUsersF
+numberOfUsersG
+numberOfUsersH
+numberOfUsersI
+numberOfUsersJ
+numberOfUsersK
+numberOfUsersL
+numberOfUsersM
+numberOfUsersN
+numberOfUsersO
+numberOfUsersP
+numberOfUsersQ
+numberOfUsersR
+numberOfUsersS
+numberOfUsersT
+numberOfUsersU
+numberOfUsersV
+numberOfUsersW
+numberOfUsersX
+numberOfUsersY
+numberOfUsersZ
+numberOfUsersZZ
+
+
+totalPoolWeight = (
+(a * numberOfUsersA) +
+(b * numberOfUsersB) +
+(c * numberOfUsersC) +
+(d * numberOfUsersD) +
+(e * numberOfUsersE) +
+(f * numberOfUsersF) +
+(g * numberOfUsersG) +
+(h * numberOfUsersH) +
+(i * numberOfUsersI) +
+(j * numberOfUsersJ) +
+(k * numberOfUsersK) +
+(l * numberOfUsersL) +
+(m * numberOfUsersM) +
+(n * numberOfUsersN) +
+(o * numberOfUsersO) +
+(p * numberOfUsersP) +
+(q * numberOfUsersQ) +
+(r * numberOfUsersR) +
+(s * numberOfUsersS) +
+(t * numberOfUsersT) +
+(u * numberOfUsersU) +
+(v * numberOfUsersV) +
+(w * numberOfUsersW) +
+(x * numberOfUsersX) +
+(y * numberOfUsersY) +
+(z * numberOfUsersZ) +
+(zz * numberOfUsersZZ)
+) 
+
+
+averagePoolWeight = totalAmount/totalPoolWeight
+
+aPoolWeight = (a * numberOfUsersA * averagePoolWeight)
+bPoolWeight = (b * numberOfUsersB * averagePoolWeight)
+cPoolWeight = (c * numberOfUsersC * averagePoolWeight)
+dPoolWeight = (d * numberOfUsersD * averagePoolWeight)
+ePoolWeight = (e * numberOfUsersE * averagePoolWeight)
+fPoolWeight = (f * numberOfUsersF * averagePoolWeight)
+gPoolWeight = (g * numberOfUsersG * averagePoolWeight)
+hPoolWeight = (h * numberOfUsersH * averagePoolWeight)
+iPoolWeight = (i * numberOfUsersI * averagePoolWeight)
+jPoolWeight = (j * numberOfUsersJ * averagePoolWeight)
+kPoolWeight = (k * numberOfUsersK * averagePoolWeight)
+lPoolWeight = (l * numberOfUsersL * averagePoolWeight)
+mPoolWeight = (m * numberOfUsersM * averagePoolWeight)
+nPoolWeight = (n * numberOfUsersN * averagePoolWeight)
+oPoolWeight = (o * numberOfUsersO * averagePoolWeight)
+pPoolWeight = (p * numberOfUsersP * averagePoolWeight)
+qPoolWeight = (q * numberOfUsersQ * averagePoolWeight)
+rPoolWeight = (r * numberOfUsersR * averagePoolWeight)
+sPoolWeight = (s * numberOfUsersS * averagePoolWeight)
+tPoolWeight = (t * numberOfUsersT * averagePoolWeight)
+uPoolWeight = (u * numberOfUsersU * averagePoolWeight)
+vPoolWeight = (v * numberOfUsersV * averagePoolWeight)
+wPoolWeight = (w * numberOfUsersW * averagePoolWeight)
+xPoolWeight = (x * numberOfUsersX * averagePoolWeight)
+yPoolWeight = (y * numberOfUsersY * averagePoolWeight)
+zPoolWeight = (z * numberOfUsersZ * averagePoolWeight)
+zzPoolWeight = (zz * numberOfUsersZZ * averagePoolWeight)
+
+
+allocatedAmountToUsersA =   aPoolWeight / numberOfUsersA
+allocatedAmountToUsersB =   bPoolWeight / numberOfUsersB
+allocatedAmountToUsersC =   cPoolWeight / numberOfUsersC
+allocatedAmountToUsersD =   dPoolWeight / numberOfUsersD
+allocatedAmountToUsersE =   ePoolWeight / numberOfUsersE
+allocatedAmountToUsersF =   fPoolWeight / numberOfUsersF
+allocatedAmountToUsersG =   gPoolWeight / numberOfUsersG
+allocatedAmountToUsersH =   hPoolWeight / numberOfUsersH
+allocatedAmountToUsersI =   iPoolWeight / numberOfUsersI
+allocatedAmountToUsersJ =   jPoolWeight / numberOfUsersJ
+allocatedAmountToUsersK =   kPoolWeight / numberOfUsersK
+allocatedAmountToUsersL =   lPoolWeight / numberOfUsersL
+allocatedAmountToUsersM =   mPoolWeight / numberOfUsersM
+allocatedAmountToUsersN =   nPoolWeight / numberOfUsersN
+allocatedAmountToUsersO =   oPoolWeight / numberOfUsersO
+allocatedAmountToUsersP =   pPoolWeight / numberOfUsersP
+allocatedAmountToUsersQ =   qPoolWeight / numberOfUsersQ
+allocatedAmountToUsersR =   rPoolWeight / numberOfUsersR
+allocatedAmountToUsersS =   sPoolWeight / numberOfUsersS
+allocatedAmountToUsersT =   tPoolWeight / numberOfUsersT
+allocatedAmountToUsersU =   uPoolWeight / numberOfUsersU
+allocatedAmountToUsersV =   vPoolWeight / numberOfUsersV
+allocatedAmountToUsersW =   wPoolWeight / numberOfUsersW
+allocatedAmountToUsersX =   xPoolWeight / numberOfUsersX
+allocatedAmountToUsersY =   yPoolWeight / numberOfUsersY
+allocatedAmountToUsersZ =   zPoolWeight / numberOfUsersZ
+allocatedAmountToUsersZZ =   zzPoolWeight / numberOfUsersZZ
+
+
+
+
+allocatedAmountOfUsersH =   hPoolWeight / numberOfUsersH

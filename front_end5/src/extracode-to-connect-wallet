@@ -1,0 +1,184 @@
+
+// const [walletAccount, setWalletAccount] = useState('')
+// const [currentChain, setCurrentChain] = useState('')
+// const [showBalanceModal, setShowBalanceModal] = useState(false)
+// const [showTransactionModal, setShowTransactionModal] = useState(false)
+// const [isConnected, setIsConnected] = useState(false)
+// const [ethBalance, setEthBalance] = useState(null)
+
+// console.log('11')
+// console.log(account)
+// console.log(chainId)
+// console.log(window.ethereum.isConnected)
+// console.log('22')
+
+
+
+// const component = async () => {
+//   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+//   console.log(accounts[0])
+//   console.log('innside useffect')
+//   setWalletAccount(accounts[0])
+//   console.log(walletAccount)
+//   console.log('inside too')
+//   const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
+//   setCurrentChain(currentChainId)
+//   activateBrowserWallet()
+
+
+//   return (accounts[0])
+
+// }
+// component()
+
+// // Initialize the application and MetaMask Event Handlers
+// useEffect(() => {
+
+//   // Setup Listen Handlers on MetaMask change events
+//   if (typeof window.ethereum !== 'undefined') {
+
+
+//     // const account = accounts[0]
+//     // setWalletAccount(accounts[0])
+//     // Add Listener when accounts switch
+//     window.ethereum.on('accountsChanged', (accounts: any) => {
+
+//       console.log('Account changed: ', accounts[0])
+//       setWalletAccount(accounts[0])
+
+//     })
+
+//     // Do something here when Chain changes
+//     window.ethereum.on('chainChanged', (chaindId: any) => {
+
+//       console.log('Chain ID changed: ', chaindId)
+//       setCurrentChain(chaindId)
+
+//     })
+
+//   } else {
+
+//     alert('Please install MetaMask to use this service!')
+
+//   }
+// }, [])
+
+// console.log(walletAccount)
+
+// // Used to see if the wallet is currently connected to the application
+// // If an account has been accessed with MetaMask, then the wallet is connected to the application.
+// useEffect(() => {
+//   setIsConnected(walletAccount ? true : false)
+// }, [walletAccount])
+
+// // Connect the Wallet to the current selected account in MetaMask.
+// // Will generate a login request for user if no account is currently connected to the application
+// const handleConnectWallet = async () => {
+
+//   console.log('Connecting MetaMask...')
+
+//   const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' })
+//   const account = accounts[0]
+
+//   console.log('Account: ', account)
+//   setWalletAccount(account)
+// }
+
+// // Handle Disconnected. Removing the state of the account connected
+// // to your app should be enough to handle Disconnect with your application.
+// const handleDisconnect = async () => {
+
+//   console.log('Disconnecting MetaMask...')
+//   setIsConnected(false)
+//   setWalletAccount('')
+// }
+
+// // Connect Once and set the account.
+// // Can be used to trigger a new account request each time,
+// // unlike 'eth_requestAccounts'
+// const handleConnectOnce = async () => {
+
+//   const accounts = await window.ethereum.request({
+//     method: 'wallet_requestPermissions',
+//     params: [{
+//       eth_accounts: {}
+//     }]
+//   }).then(() => window.ethereum.request({ method: 'eth_requestAccounts' }))
+
+//   setWalletAccount(accounts[0])
+
+// }
+
+
+
+// console.log('chainId')
+// console.log(chainId)
+// console.log('chainId')
+// if (window.ethereum) {
+//   console.log('you are here 1')
+//   console.log(window.ethereum)
+
+// }
+
+// useEffect(() => {
+//   // if (typeof window.ethereum !== 'undefined' ) {
+
+//   // }
+//   if (window.ethereum) {
+//     window.ethereum.on('chainChanged', () => {
+//       // window.location.reload();
+//       console.log('you are here bbbb')
+
+//       console.log('1asdfghj')
+//     })
+
+//   }
+// }, [])
+
+
+
+// useEffect(() => {
+//   // if (typeof window.ethereum !== 'undefined' ) {
+
+//   // }
+//   if (window.ethereum) {
+//     window.ethereum.on('accountsChanged', () => {
+//       // window.location.reload();
+//       console.log('Account has changed')
+
+//     })
+
+//   }
+// }, [])
+
+
+
+
+
+
+/////////////////////////////////// RETURN THIS ()
+
+{/* <h2>{walletAccount}</h2>
+      <h2>{currentChain}</h2>
+      <Button onClick={handleConnectWallet}>this</Button>
+      <Button onClick={handleDisconnect}>Disconnect</Button>
+      <Box sx={{ m: 2 }}>
+        {isConnected ? (
+          <Chip label="Disconnect!!!!"
+            component="a"
+            // href="/5"
+            onClick={deactivate}
+            clickable
+          />
+        ) : (
+          <Chip label="Connect Wallet!"
+            component="a"
+            // href="/5"
+            onClick={() => activateBrowserWallet()}
+
+            clickable />
+        )}
+      </Box> */}
+
+{/* {(currentChain == "0x2a") ?
+        (): (<InformationPage />)} */}

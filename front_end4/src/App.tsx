@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, } from 'react';
 import './App.scss';
 
 
@@ -24,6 +24,8 @@ declare global {
   }
 }
 
+
+
 // const Provider = window.ethereum;
 
 function App() {
@@ -31,13 +33,9 @@ function App() {
   const { account, activateBrowserWallet, deactivate, chainId } = useEthers()
   const isConnected = account !== undefined
 
-
-
-
   return (
     <>
       {/* <div className="hero-img"></div> */}
-
       <DAppProvider config={{
         // supportedChains: [ChainId.Kovan],
         // multicallVersion: 2,
@@ -47,15 +45,15 @@ function App() {
         }
       }}>
 
-        {/* <BrowserRouter> */}
-        {/* <ResponsiveAppBar1 /> */}
-        {/* <Header1 /> */}
+        <BrowserRouter>
+          {/* <ResponsiveAppBar1 /> */}
+          {/* <Header1 /> */}
 
-        <ResponsiveAppBar />
+          <ResponsiveAppBar />
 
-        <h2>{account}</h2>
-        {/* <Main /> */}
-        {/* <Box >
+          {/* <h2>{account}</h2> */}
+          {/* <Main /> */}
+          {/* <Box >
             <Container maxWidth="md" sx={{ mt: 0 }}>
               <Balance label={`Your staked balance:`} amount={20}
                 tokenImgSrc={'this'} />
@@ -65,8 +63,10 @@ function App() {
               </Routes>
             </Container>
           </Box> */}
-        {/* </BrowserRouter> */}
+        </BrowserRouter>
       </DAppProvider>
+
+
     </>
 
 

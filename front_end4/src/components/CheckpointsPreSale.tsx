@@ -87,10 +87,11 @@ export const CheckpointsPreSale = () => {
 
     const connectedToMetaMask = account !== undefined
 
-    const busdTokenAddress = '0x4Fabb145d64652a948d72533023f6E7A623C7C53'
+    const busdTokenAddress = '0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06'
 
     const busdTokenBalance = useTokenBalance(busdTokenAddress, account)
     const formattedBusdTokenBalance: number = busdTokenBalance ? parseFloat(formatUnits(busdTokenBalance, 18)) : 0
+    const busdAvailable = (formattedBusdTokenBalance > 0) ? true : false
 
     const ethBalance = useEtherBalance(account)
     const formattedEthBalance: number = ethBalance ? parseFloat(formatUnits(ethBalance, 18)) : 0
@@ -99,10 +100,10 @@ export const CheckpointsPreSale = () => {
     const [checkpoints, setCheckpoints] = useState(false)
 
     useEffect(() => {
-        if (connectedToMetaMask && ethAvailable) {
+        if (connectedToMetaMask && ethAvailable && busdAvailable) {
             setCheckpoints(true)
         }
-    }, [connectedToMetaMask, ethAvailable])
+    }, [connectedToMetaMask, ethAvailable, busdAvailable])
 
     return (
         <>

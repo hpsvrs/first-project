@@ -129,6 +129,16 @@ a{
   }
 }
 
+.under-header {
+  padding: 0;
+  margin: .1em;
+}
+
+a.menu-link {
+  padding-top: unset;
+  padding-right: unset;
+}
+
 .participationDirection {
   text-align: center;
   background-color: black;
@@ -200,6 +210,8 @@ a{
 
 }
 
+
+
 .btn-unstake {
   
   margin: 1em;
@@ -221,6 +233,21 @@ a{
     box-shadow: 3px 2px 22px 1px rgba(0, 0, 0, 0.24);
 
   }
+}
+.btn-shadow {
+  box-shadow: 0 9px #999;
+  margin: .5em;
+  &:hover {
+    background-color: #3e8e41;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    // box-shadow: 0 5px #666;
+
+  }
+  &:active {
+    box-shadow: 0 5px #666;
+    transform: translateY(4px)
+  }
+
 }
 
 .form {
@@ -286,6 +313,8 @@ a{
     h4 {
       font-size: .5rem;
       text-transform: uppercase;
+      margin-bottom: .6em;
+      margin-top: .1em;
       // font-weight: 2em;
     }
     

@@ -4,7 +4,7 @@ import { formatUnits } from "@ethersproject/units"
 import { Token } from "./Main"
 import Box from '@mui/material/Box';
 import { Grid } from "@material-ui/core";
-import React, { useState } from "react"
+import React, { useState, createContext, useContext } from "react"
 import { TabContext, TabList, TabPanel } from "@material-ui/lab"
 import { tokenToString } from "typescript";
 import { Tab, Typography } from "@material-ui/core"
@@ -17,6 +17,8 @@ import { CompleteGridPurchasedPreSaleBalance } from "./yourWallet/CompleteGridPu
 
 import { CheckpointsPreSale } from "./CheckpointsPreSale"
 import { findByLabelText } from "@testing-library/react";
+import { MyContext } from './Header2'
+
 
 const useStyles = makeStyles((theme) => ({
     tabContent: {
@@ -62,9 +64,11 @@ interface YourWalletProps {
 }
 
 
-
 export const PreSale = ({ supportedTokens }: YourWalletProps) => {
+    const data = useContext(MyContext)
+    const { chainIdentity, tokenFarmContractAddress, dappTokenAddress: dapp_token_address } = data
 
+    console.log("You are in PreSale Context: chainIdentity " + chainIdentity + " tokenFarmL " + tokenFarmContractAddress)
     const { account } = useEthers()
 
     const connectedToMetaMask = account !== undefined
@@ -84,58 +88,63 @@ export const PreSale = ({ supportedTokens }: YourWalletProps) => {
     }
     const classes = useStyles()
     return (
-        <Box>
+        <>
+            <div>
+                <h1 className="section-heading">UnStake! Tokens</h1>
+            </div>
+            <Box>
+                <CompleteGridPurchasedPreSaleBalance tokenAddress={dappTokenAddress} />
 
-            <CompleteGridPurchasedPreSaleBalance tokenAddress={dappTokenAddress} />
+                <CheckpointsPreSale />
 
-            <CheckpointsPreSale />
+                {/* <h2 className={classes.header}><span className={classes.spanparticipation}>Participation...</span></h2> */}
+                <h1 className="section-heading"> Participate...</h1>
+                {(connectedToMetaMask && (formattedEthBalance > 0)
+                    && (formattedBusdTokenBalance == 0)) ? (
+                    <Box className={classes.box}>
 
-            {/* <h2 className={classes.header}><span className={classes.spanparticipation}>Participation...</span></h2> */}
-            <h1 className="section-heading"> Participate...</h1>
-            {(connectedToMetaMask && (formattedEthBalance > 0)
-                && (formattedBusdTokenBalance == 0)) ? (
-                <Box className={classes.box}>
+                        <TabContext value={selectedTokenIndex.toString()} >
 
-                    <TabContext value={selectedTokenIndex.toString()} >
+                            <TabList onChange={handleChange} aria-label="stake form tabs">
+                                {supportedTokens.map((token, index) => {
 
-                        <TabList onChange={handleChange} aria-label="stake form tabs">
+                                    return (
+                                        <Tab label={token.name}
+                                            value={index.toString()}
+                                            key={index}>
+
+                                        </Tab>
+                                    )
+                                })}
+                            </TabList>
+
                             {supportedTokens.map((token, index) => {
-
                                 return (
-                                    <Tab label={token.name}
-                                        value={index.toString()}
-                                        key={index}>
-
-                                    </Tab>
+                                    <TabPanel value={index.toString()} key={index}>
+                                        <div className={classes.tabContent}>
+                                            <WalletBalance token={supportedTokens[selectedTokenIndex]} />
+                                            {/* <UnStakeForm token={supportedTokens[selectedTokenIndex]} /> */}
+                                            <PreSaleForm token={supportedTokens[selectedTokenIndex]} />
+                                        </div>
+                                    </TabPanel>
                                 )
                             })}
-                        </TabList>
 
-                        {supportedTokens.map((token, index) => {
-                            return (
-                                <TabPanel value={index.toString()} key={index}>
-                                    <div className={classes.tabContent}>
-                                        <WalletBalance token={supportedTokens[selectedTokenIndex]} />
-                                        {/* <UnStakeForm token={supportedTokens[selectedTokenIndex]} /> */}
-                                        <PreSaleForm token={supportedTokens[selectedTokenIndex]} />
-                                    </div>
-                                </TabPanel>
-                            )
-                        })}
+                        </TabContext>
+                    </Box>
+                ) : (
+                    <Box className="participationDirection" alignItems="center"
+                        justifyContent="center"
+                        display="flex" >
+                        <div>
+                            <h3>Once met the checkpoints pre-sale will display here...</h3>
+                        </div>
 
-                    </TabContext>
-                </Box>
-            ) : (
-                <Box className="participationDirection" alignItems="center"
-                    justifyContent="center"
-                    display="flex" >
-                    <div>
-                        <h3>Once met the checkpoints pre-sale will display here...</h3>
-                    </div>
+                    </Box>)
+                }
 
-                </Box>)
-            }
+            </Box>
+        </>
 
-        </Box>
     )
 }

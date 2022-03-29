@@ -12,6 +12,12 @@ networks:
     verify: False
   ganache:
     verify: False
+  bsc-test:
+    verify: False
+    weth_token: '0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c'
+    fau_token: '0xFab46E002BbF0b4509813474841E0716E6730136'
+    dai_usd_price_feed: '0xE4eE17114774713d2De0eC0f035d4F7665fc025D'
+    eth_usd_price_feed: '0x143db3CEEfbdfe5631aDD3E50f7614B6ba708BA7'
   kovan:
     verify: False
     weth_token: '0xd0a1e359811322d97991e03f863a0c30c2cf029c'

@@ -8,6 +8,12 @@ import { WalletBalance } from "./WalletBalance";
 import { StakeForm } from "./StakeForm"
 import { makeStyles } from "@material-ui/core"
 import { CheckpointsPreSale } from "../CheckpointsPreSale";
+import { useEthers } from "@usedapp/core";
+
+import { GridTotalStaking } from "./GridTotalStaking";
+import { useContext } from "react";
+import { MyContext } from "../Header2";
+import { GridStakingUnstaking } from "./GridStakingUnstaking";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -35,6 +41,10 @@ interface YourWalletProps {
 
 
 export const YourWallet = ({ supportedTokens }: YourWalletProps) => {
+    const { dappTokenAddress } = useContext(MyContext)
+
+    const { account } = useEthers()
+    const isConnected = account !== undefined
 
     const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0)
     console.log("supported tokens")
@@ -45,33 +55,44 @@ export const YourWallet = ({ supportedTokens }: YourWalletProps) => {
     }
     const classes = useStyles()
     return (
-        <Box className="" sx={{ mt: 4 }}>
-            <CheckpointsPreSale />
+        <>
+            <div>
+                <h1 className="section-heading"> Stake! Tokens</h1>
+                <GridTotalStaking tokenAddress={dappTokenAddress} />
+                <GridStakingUnstaking tokenAddress={dappTokenAddress} />
+            </div>
+            <Box className="" sx={{ mt: 4 }}>
+                <CheckpointsPreSale />
 
-            <Box className={classes.box}>
-                <TabContext value={selectedTokenIndex.toString()}>
-                    <TabList onChange={handleChange} aria-label="stake form tabs">
-                        {supportedTokens.map((token, index) => {
-                            return (
-                                <Tab label={token.name}
-                                    value={index.toString()}
-                                    key={index} />
-                            )
-                        })}
-                    </TabList>
-                    {supportedTokens.map((token, index) => {
-                        return (
-                            <TabPanel value={index.toString()} key={index.toString()}>
-                                <div className={classes.tabContent}>
-                                    <WalletBalance token={supportedTokens[selectedTokenIndex]} />
-                                    <StakeForm token={supportedTokens[selectedTokenIndex]} />
-                                </div>
+                {(isConnected) ? (
+                    <Box className={classes.box}>
+                        <TabContext value={selectedTokenIndex.toString()}>
+                            <TabList onChange={handleChange} aria-label="stake form tabs">
+                                {supportedTokens.map((token, index) => {
+                                    return (
+                                        <Tab label={token.name}
+                                            value={index.toString()}
+                                            key={index} />
+                                    )
+                                })}
+                            </TabList>
+                            {supportedTokens.map((token, index) => {
+                                return (
+                                    <TabPanel value={index.toString()} key={index.toString()}>
+                                        <div className={classes.tabContent}>
+                                            <WalletBalance token={supportedTokens[selectedTokenIndex]} />
+                                            <StakeForm token={supportedTokens[selectedTokenIndex]} />
+                                        </div>
 
-                            </TabPanel>
-                        )
-                    })}
-                </TabContext>
+                                    </TabPanel>
+                                )
+                            })}
+                        </TabContext>
+                    </Box>
+                ) : (<h1 className="section-heading"> Connect to Wallet...</h1>)}
+
             </Box>
-        </Box>
+        </>
+
     )
 }

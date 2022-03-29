@@ -1,6 +1,7 @@
 from lib2to3.pgen2 import token
 from time import sleep
 from brownie import network, exceptions
+from web3 import Web3
 from scripts.deploy import deploy_token_farm_and_dapp_token
 from scripts.helpful_scripts import (
     LOCAL_BLOCKCHAIN_ENVIRONMENTS,
@@ -9,6 +10,250 @@ from scripts.helpful_scripts import (
     INITIAL_VALUE,
 )
 import pytest
+
+
+def test_preSaleFundEachPreSaleNumberWithoutStaking(amount_staked):
+    # Arrange
+    amount_to_collect_for_this_pre_sale = Web3.toWei((100), "ether")
+    amount_to_stake = Web3.toWei((1500 * 170), "ether")
+    amount_to_purchase = Web3.toWei(10, "ether")
+    amount_to_claim = Web3.toWei(4, "ether")
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+
+    token_farm.updateTimesEachPreSale(0, 1, {"from": account})
+
+    token_farm.setTotalAmountToCollectForThisPreSale(
+        0, amount_to_collect_for_this_pre_sale, {"from": account}
+    )
+
+    token_farm.setPreSaleFundEachPreSaleNumberWithoutStakingStatus(
+        0, True, {"from": account}
+    )
+    dapp_token.approve(token_farm.address, amount_to_purchase, {"from": account})
+
+    # Act
+    tx_preSaleFundEachPreSaleNumberWithoutStakingStatus = (
+        token_farm.preSaleFundEachPreSaleNumberWithoutStaking(
+            amount_to_purchase, dapp_token, dapp_token, 0, {"from": account}
+        )
+    )
+    tx_preSaleFundEachPreSaleNumberWithoutStakingStatus.wait(1)
+    totalPurchasedPreSaleTokensEachPreSale = (
+        token_farm.totalPurchasedPreSaleTokensEachPreSale(0, account)
+    )
+    setTotalAmountToCollectForThisPreSale = (
+        token_farm.totalAmountToCollectForThisPreSale(0)
+    )
+
+    # Assert
+    setTotalAmountToCollectForThisPreSale == amount_to_collect_for_this_pre_sale
+    totalPurchasedPreSaleTokensEachPreSale == amount_to_purchase
+
+
+def test_claimAllTokensEachPreSale(amount_staked):
+    # Arrange
+    amount_to_collect_for_this_pre_sale = Web3.toWei((100), "ether")
+    amount_to_stake = Web3.toWei((1500 * 170), "ether")
+    amount_to_purchase = Web3.toWei(10, "ether")
+    amount_to_claim = Web3.toWei(4, "ether")
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+
+    token_farm.updateTimesEachPreSale(0, 1, {"from": account})
+
+    token_farm.setTotalAmountToCollectForThisPreSale(
+        0, amount_to_collect_for_this_pre_sale, {"from": account}
+    )
+
+    dapp_token.approve(token_farm.address, amount_to_stake, {"from": account})
+    token_farm.stakeTokens(amount_to_stake, dapp_token.address, {"from": account})
+
+    tx_setParticipateInPreSaleAllocationStatus = (
+        token_farm.setParticipateInPreSaleAllocationStatus(0, True, {"from": account})
+    )
+    tx_participateInPreSaleAllocation = token_farm.participateInPreSaleAllocation(
+        0, dapp_token.address, {"from": account}
+    )
+
+    token_farm.setPreSaleAllocationStatus(0, True, {"from": account})
+
+    token_farm.setClaimTokensEachPreSaleStatus(0, True, {"from": account})
+    # token_farm.setPercentageWithdrawAllowedEachPreSale(0, 10, {"from": account})
+    token_farm.manuallySetPercentageWithdrawAllowedEachPreSale(0, 50, {"from": account})
+
+    token_farm.updatePreSaleTokenAddressEachPreSale(0, dapp_token, {"from": account})
+    token_farm.setPreSaleFundEachPreSaleNumberStatus(0, True, {"from": account})
+
+    dapp_token.approve(token_farm.address, amount_to_purchase, {"from": account})
+
+    token_farm.preSaleFundEachPreSaleNumber(
+        amount_to_purchase, dapp_token, dapp_token, 0, {"from": account}
+    )
+    # Act
+    # tx_claimAllTokensEachPreSale = token_farm.claimAllTokensEachPreSale(
+    #     0, {"from": account}
+    # )
+
+    tx_claimTokensEachPreSale = token_farm.claimTokensEachPreSale(
+        0, amount_to_claim, {"from": account}
+    )
+    totalWithdrawnPreSaleTokensEachPreSale = (
+        token_farm.totalWithdrawnPreSaleTokensEachPreSale(0, account)
+    )
+    getAvailablePreSaleTokensToWithdrawEachPreSale = (
+        token_farm.getAvailablePreSaleTokensToWithdrawEachPreSale(
+            dapp_token.address, account, 0, {"from": account}
+        )
+    )
+    tx_withdrawCollectedFundEachPreSale = token_farm.withdrawCollectedFundEachPreSale(
+        0, dapp_token.address, {"from": account}
+    )
+    collectedPreSaleFundsEachPreSale = token_farm.collectedPreSaleFundsEachPreSale(
+        0, dapp_token.address
+    )
+    # Assert
+    assert totalWithdrawnPreSaleTokensEachPreSale == (4 * (10 ** 18))
+    assert getAvailablePreSaleTokensToWithdrawEachPreSale == (1 * (10 ** 18))
+    assert collectedPreSaleFundsEachPreSale == 0
+
+
+def test_preSaleFundEachPreSaleNumber(amount_staked):
+    # Arrange
+    amount_to_stake = Web3.toWei((1500 * 170), "ether")
+    amount_to_purchase = Web3.toWei(10, "ether")
+    amount_to_claim = Web3.toWei(0.1, "ether")
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+    tx_setParticipateInPreSaleAllocationStatus = (
+        token_farm.setParticipateInPreSaleAllocationStatus(0, True, {"from": account})
+    )
+    dapp_token.approve(token_farm.address, amount_to_stake, {"from": account})
+    token_farm.stakeTokens(amount_to_stake, dapp_token.address, {"from": account})
+    token_farm.setPreSaleAllocationStatus(0, True, {"from": account})
+    token_farm.setTotalAmountToCollectForThisPreSale(
+        0, (100 * (10 ** 18)), {"from": account}
+    )
+    tx_participateInPreSaleAllocation = token_farm.participateInPreSaleAllocation(
+        0, dapp_token.address, {"from": account}
+    )
+
+    token_farm.updateTimesEachPreSale(0, 2, {"from": account})
+    token_farm.setClaimTokensEachPreSaleStatus(0, True, {"from": account})
+    token_farm.setPercentageWithdrawAllowedEachPreSale(0, 10, {"from": account})
+    token_farm.updatePreSaleTokenAddressEachPreSale(0, dapp_token, {"from": account})
+    # Act
+    token_farm.setPreSaleFundEachPreSaleNumberStatus(0, True, {"from": account})
+
+    dapp_token.approve(token_farm.address, amount_to_purchase, {"from": account})
+
+    token_farm.preSaleFundEachPreSaleNumber(
+        amount_to_purchase, dapp_token, dapp_token, 0, {"from": account}
+    )
+    purchasedBalanceEachPreSale = token_farm.purchasedBalanceEachPreSale(0, account)
+    totalPurchasedPreSaleTokensEachPreSale = (
+        token_farm.totalPurchasedPreSaleTokensEachPreSale(0, account)
+    )
+    collectedPreSaleFundsEachPreSale = token_farm.collectedPreSaleFundsEachPreSale(
+        0, dapp_token.address
+    )
+    totalCollectionOfPreSaleFundsEachPreSale = (
+        token_farm.totalCollectionOfPreSaleFundsEachPreSale(0, dapp_token)
+    )
+    totalCollectionOfPreSaleFundsAllTokens = (
+        token_farm.totalCollectionOfPreSaleFundsAllTokens()
+    )
+    preSaleFundersEachPreSale = token_farm.preSaleFundersEachPreSale(0, 0)
+    # tx_claimAllTokensEachPreSale = token_farm.claimAllTokensEachPreSale(
+    #     0, {"from": account}
+    # )
+    tx_claimTokensEachPreSale = token_farm.claimTokensEachPreSale(
+        0, amount_to_claim, {"from": account}
+    )
+    # Assert
+    assert token_farm.preSaleFundEachPreSaleNumberStatus(0) == True
+    assert purchasedBalanceEachPreSale == amount_to_purchase
+    assert totalPurchasedPreSaleTokensEachPreSale == (2 * amount_to_purchase)
+    assert collectedPreSaleFundsEachPreSale == amount_to_purchase
+    assert totalCollectionOfPreSaleFundsEachPreSale == amount_to_purchase
+    assert totalCollectionOfPreSaleFundsAllTokens == amount_to_purchase + amount_staked
+
+
+def test_participate_in_pre_sale_allocation(amount_staked):
+    # Arrange
+    amount_to_stake = Web3.toWei((1500 * 170), "ether")
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+    tx_setParticipateInPreSaleAllocationStatus = (
+        token_farm.setParticipateInPreSaleAllocationStatus(0, True, {"from": account})
+    )
+    dapp_token.approve(token_farm.address, amount_to_stake, {"from": account})
+    token_farm.stakeTokens(amount_to_stake, dapp_token.address, {"from": account})
+    token_farm.setPreSaleAllocationStatus(0, True, {"from": account})
+    token_farm.setTotalAmountToCollectForThisPreSale(
+        0, (100 * (10 ** 18)), {"from": account}
+    )
+    # Act
+    tx_participateInPreSaleAllocation = token_farm.participateInPreSaleAllocation(
+        0, dapp_token.address, {"from": account}
+    )
+    staking_level_user_counter = token_farm.stakingLevelUserCounter(28)
+    when_participated_that_level = token_farm.whenParticipatedThatLevel(account)
+    get_allocated_pre_sale_amount = token_farm.getAllocatedPreSaleAmount(
+        account, dapp_token.address, 0, {"from": account}
+    )
+    totalAmountToCollectForThisPreSale = token_farm.totalAmountToCollectForThisPreSale(
+        0
+    )
+
+    # Assert
+    assert staking_level_user_counter == 1
+    assert when_participated_that_level == 28
+    assert get_allocated_pre_sale_amount > (99 * (10 ** 18))
+    assert totalAmountToCollectForThisPreSale == (100 * (10 ** 18))
+
+
+def test_get_staking_level(amount_staked):
+    # Arrange
+    amount_to_stake = Web3.toWei((1500 * 170), "ether")
+
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+    dapp_token.approve(token_farm.address, amount_to_stake, {"from": account})
+    token_farm.stakeTokens(amount_to_stake, dapp_token.address, {"from": account})
+
+    # Act
+    staking_level = token_farm.getStakingLevel(
+        account.address, dapp_token.address, {"from": account}
+    )
+    # Assert
+    assert staking_level == 28
+
+
+def test_staking_level_to_weight(amount_staked):
+    # Arrange
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+
+    # Act
+    staking_level_to_weight = token_farm.stakingLevelToWeight(0, {"from": account})
+    staking_level_to_weight1 = token_farm.stakingLevelToWeight(1, {"from": account})
+    staking_level_to_weight20 = token_farm.stakingLevelToWeight(20, {"from": account})
+
+    # Assert
+    assert staking_level_to_weight == 0
+    assert staking_level_to_weight1 == 1
+    assert staking_level_to_weight20 == 70
+
+
+def test_pre_sale_number_status(amount_staked):
+    # Arrange
+    token_farm, dapp_token, account = test_pre_sale_fund(amount_staked)
+
+    # Act
+    status = token_farm.preSaleNumberStatus(0)
+    tx_change_bool = token_farm.changePreSaleNumberStatus(0, True, {"from": account})
+    status1 = token_farm.preSaleNumberStatus(0)
+    tx_change_bool1 = token_farm.changePreSaleNumberStatus(0, False, {"from": account})
+    status2 = token_farm.preSaleNumberStatus(0)
+    # Assert
+    assert status == False
+    assert status1 == True
+    assert status2 == False
 
 
 def test_set_APY(amount_staked):

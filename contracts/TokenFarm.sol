@@ -38,7 +38,7 @@ contract TokenFarm is Ownable {
     uint256 public totalCollectionOfPreSaleFundsAllTokens;
 
     mapping(address => uint256) public totalPurchasedPreSaleTokens;
-    uint256 private TIMES;
+    uint256 public TIMES;
     // mapping(address => mapping(address => uint256))
     //     public preSaleTokensAvailableToWithdraw;
 
@@ -56,6 +56,710 @@ contract TokenFarm is Ownable {
     mapping(address => uint256) public uniquePreSaleTokensStaked;
     uint256 public singleTokenAllPreSaleBalance;
 
+    // Pre Sale Status and Allocation Round Variables
+
+    mapping(uint256 => uint256) public stakingLevelToWeight; // this assign each staking level accordign to their weight value
+    mapping(uint256 => bool) public participateInPreSaleAllocationStatus; // This helps activate or deactive the function "participateInPreSaleAllocation"
+    uint256 baseNumberStakingLevel = 1500;
+    mapping(uint256 => mapping(uint256 => uint256))
+        public stakingLevelUserCounter; // this counts the number of participated users in each staking level
+    mapping(uint256 => mapping(address => bool))
+        public preSaleParticipantsStatus;
+    mapping(address => uint256) public whenParticipatedThatLevel; // this is the staking level of user when he/she particpated in pre-sale
+    mapping(uint256 => uint256) public totalAmountToCollectForThisPreSale; // determines how much amount you want to collect for this pre-sale
+    mapping(uint256 => bool) public preSaleAllocationStatus; // determines if Allocation round has started allowed. start it after turning participation
+
+    constructor(address _dappTokenAddress, address _priceFeed) public {
+        dappToken = IERC20(_dappTokenAddress);
+        // owner = msg.sender;
+        priceFeedA = AggregatorV3Interface(_priceFeed);
+
+        stakingLevelToWeight[0] = 0;
+        stakingLevelToWeight[1] = 1;
+        stakingLevelToWeight[2] = 2;
+        stakingLevelToWeight[3] = 3;
+        stakingLevelToWeight[4] = 4;
+        stakingLevelToWeight[5] = 5;
+        stakingLevelToWeight[6] = 6;
+        stakingLevelToWeight[7] = 7;
+        stakingLevelToWeight[8] = 8;
+        stakingLevelToWeight[9] = 9;
+        stakingLevelToWeight[10] = 10;
+        stakingLevelToWeight[11] = 15;
+        stakingLevelToWeight[12] = 20;
+        stakingLevelToWeight[13] = 25;
+        stakingLevelToWeight[14] = 30;
+        stakingLevelToWeight[15] = 35;
+        stakingLevelToWeight[16] = 40;
+        stakingLevelToWeight[17] = 45;
+        stakingLevelToWeight[18] = 50;
+        stakingLevelToWeight[19] = 60;
+        stakingLevelToWeight[20] = 70;
+        stakingLevelToWeight[21] = 80;
+        stakingLevelToWeight[22] = 90;
+        stakingLevelToWeight[23] = 100;
+        stakingLevelToWeight[24] = 110;
+        stakingLevelToWeight[25] = 120;
+        stakingLevelToWeight[26] = 130;
+        stakingLevelToWeight[27] = 140;
+        stakingLevelToWeight[28] = 150;
+    }
+
+    //
+    // Pre Sale numbers and allocation per user
+    // -------------------------------
+    // Once the participant enters they wont be able to re-enter
+
+    function setTotalAmountToCollectForThisPreSale(
+        uint256 _preSaleNumber,
+        uint256 _amount
+    ) public onlyOwner {
+        totalAmountToCollectForThisPreSale[_preSaleNumber] = _amount;
+    }
+
+    function participateInPreSaleAllocation(
+        uint256 _preSaleNumber,
+        address _token
+    ) public {
+        require(participateInPreSaleAllocationStatus[_preSaleNumber] == true); // this is help to open the pre-sale participation
+        require(stakingBalance[_token][msg.sender] >= (1500 * (10**18)));
+        require(getStakingLevel(msg.sender, _token) > 0);
+        // require(preSaleParticipantsStatus[msg.sender] == false);
+
+        uint256 stakingLevel = getStakingLevel(msg.sender, _token);
+        if (preSaleParticipantsStatus[_preSaleNumber][msg.sender] == false) {
+            stakingLevelUserCounter[_preSaleNumber][stakingLevel] =
+                stakingLevelUserCounter[_preSaleNumber][stakingLevel] +
+                1;
+        }
+        preSaleParticipantsStatus[_preSaleNumber][msg.sender] = true;
+        whenParticipatedThatLevel[msg.sender] = stakingLevel;
+        stakingTimeToWithdraw[msg.sender] = block.timestamp;
+    }
+
+    // uint256 public allPoolsTotalWeight;
+    // uint256 public amountAllocatedToEachShare;
+    // uint256 public allocatedAmountToEachUser;
+    // uint256 public users_count_each_staking_level;
+
+    function getAllocatedPreSaleAmount(
+        address _sender,
+        address _token,
+        uint256 _preSaleNumber
+    ) public view returns (uint256) {
+        require(preSaleAllocationStatus[_preSaleNumber] == true);
+        require(totalAmountToCollectForThisPreSale[_preSaleNumber] > 0);
+
+        uint256 allPoolsTotalWeight;
+        for (uint256 i = 1; i < 29; i++) {
+            uint256 eachPoolTotalWeight;
+            eachPoolTotalWeight = (stakingLevelToWeight[i] *
+                stakingLevelUserCounter[_preSaleNumber][i]);
+            allPoolsTotalWeight = allPoolsTotalWeight + eachPoolTotalWeight;
+        }
+        uint256 amountAllocatedToEachShare = (totalAmountToCollectForThisPreSale[
+                _preSaleNumber
+            ] / allPoolsTotalWeight);
+
+        // uint256 staking_level_of_sender = getStakingLevel(_sender, _token);
+
+        uint256 staking_level_of_sender = whenParticipatedThatLevel[_sender];
+
+        uint256 users_count_each_staking_level = stakingLevelUserCounter[
+            _preSaleNumber
+        ][staking_level_of_sender];
+
+        uint256 each_level_staking_weight = stakingLevelToWeight[
+            staking_level_of_sender
+        ];
+
+        uint256 allocatedAmountToEachUser;
+        allocatedAmountToEachUser = ((each_level_staking_weight *
+            users_count_each_staking_level *
+            amountAllocatedToEachShare) / users_count_each_staking_level);
+
+        return (allocatedAmountToEachUser);
+    }
+
+    function changeStakingLevelToWeight(uint256 _level, uint256 _weight)
+        public
+        onlyOwner
+    {
+        stakingLevelToWeight[_level] = _weight;
+    }
+
+    function changeBaseNumberStakingLevel(uint256 _number) public onlyOwner {
+        baseNumberStakingLevel = _number;
+    }
+
+    function setPreSaleAllocationStatus(uint256 _number, bool _status)
+        public
+        onlyOwner
+    {
+        preSaleAllocationStatus[_number] = _status;
+    }
+
+    function setParticipateInPreSaleAllocationStatus(
+        uint256 _number,
+        bool _status
+    ) public onlyOwner {
+        participateInPreSaleAllocationStatus[_number] = _status;
+    }
+
+    function getStakingLevel(address _sender, address _token)
+        public
+        view
+        returns (uint256)
+    {
+        uint256 stakingLevel = 0;
+        if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 150) * (10**18))
+        ) {
+            return stakingLevel = 28;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 140) * (10**18))
+        ) {
+            return stakingLevel = 27;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 130) * (10**18))
+        ) {
+            return stakingLevel = 26;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 120) * (10**18))
+        ) {
+            return stakingLevel = 25;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 110) * (10**18))
+        ) {
+            return stakingLevel = 24;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 100) * (10**18))
+        ) {
+            return stakingLevel = 23;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 90) * (10**18))
+        ) {
+            return stakingLevel = 22;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 80) * (10**18))
+        ) {
+            return stakingLevel = 21;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 70) * (10**18))
+        ) {
+            return stakingLevel = 20;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 60) * (10**18))
+        ) {
+            return stakingLevel = 19;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 50) * (10**18))
+        ) {
+            return stakingLevel = 18;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 45) * (10**18))
+        ) {
+            return stakingLevel = 17;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 40) * (10**18))
+        ) {
+            return stakingLevel = 16;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 35) * (10**18))
+        ) {
+            return stakingLevel = 15;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 30) * (10**18))
+        ) {
+            return stakingLevel = 14;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 25) * (10**18))
+        ) {
+            return stakingLevel = 13;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 20) * (10**18))
+        ) {
+            return stakingLevel = 12;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 15) * (10**18))
+        ) {
+            return stakingLevel = 11;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 10) * (10**18))
+        ) {
+            return stakingLevel = 10;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 9) * (10**18))
+        ) {
+            return stakingLevel = 9;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 8) * (10**18))
+        ) {
+            return stakingLevel = 8;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 7) * (10**18))
+        ) {
+            return stakingLevel = 7;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 6) * (10**18))
+        ) {
+            return stakingLevel = 6;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 5) * (10**18))
+        ) {
+            return stakingLevel = 5;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 4) * (10**18))
+        ) {
+            return stakingLevel = 4;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 3) * (10**18))
+        ) {
+            return stakingLevel = 3;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 2) * (10**18))
+        ) {
+            return stakingLevel = 2;
+        } else if (
+            stakingBalance[_token][_sender] >=
+            ((baseNumberStakingLevel * 1) * (10**18))
+        ) {
+            return stakingLevel = 1;
+        } else {
+            return stakingLevel = 0;
+        }
+    }
+
+    // pre-sale collection of funds according to each pre-sale number
+    mapping(uint256 => bool) public preSaleFundEachPreSaleNumberStatus; // this is to activate or deactive the preSaleFundEachPerPreSaleNumber Function
+    mapping(uint256 => bool) public preSaleFundFCFSEachPreSaleNumberStatus; // this is to activate or deactive the preSaleFundFCFSEachPerPreSaleNumber Function
+    mapping(uint256 => bool)
+        public preSaleFundEachPreSaleNumberWithoutStakingStatus; // this is to activate or deactive the preSaleFundFCFSEachPerPreSaleNumber Function
+
+    mapping(uint256 => bool) public claimTokensEachPreSaleStatus; // this is to activate or deactive the claimAllTokensEachPreSale Function
+
+    mapping(uint256 => mapping(address => uint256))
+        public purchasedBalanceEachPreSale; // Balance of amount spend by user in this single pre-sale
+    mapping(address => uint256) public uniquePreSaleTokensPurchased; // Collecting how many times this user has participated in the pre-sales
+    mapping(uint256 => uint256) public TIMESeachPreSale; // Determines the price of pre-sale tokens / per BUSD
+    mapping(uint256 => mapping(address => uint256))
+        public collectedPreSaleFundsEachPreSale; // This is to withdraw pre-sale collected funds, this will get zero when owner withdraw the funds
+    mapping(uint256 => mapping(address => uint256))
+        public totalCollectionOfPreSaleFundsEachPreSale; // This will not get zero after withdrawing of funds
+    mapping(uint256 => address[]) public preSaleFundersEachPreSale; // creates the list of a number of users who purchased tokens in this single pre-sale
+    mapping(uint256 => mapping(address => uint256))
+        public totalPurchasedPreSaleTokensEachPreSale; // totalPurchasedPreSaleTokensEachPreSale determines how many pre-sale tokens user will get in this pre-sale
+    mapping(uint256 => mapping(address => uint256))
+        public totalWithdrawnPreSaleTokensEachPreSale; // this is total withdrawn amount by user for this single pre-sale
+    mapping(uint256 => uint256) public percentageWithdrawAllowedEachPreSale;
+    mapping(uint256 => IERC20) public preSaleTokenAddressEachPreSale; // the is the tokens which we will deliver in return of pre-sale collected funds
+
+    function setPreSaleFundEachPreSaleNumberStatus(
+        uint256 _preSaleNumber,
+        bool _status
+    ) public onlyOwner {
+        preSaleFundEachPreSaleNumberStatus[_preSaleNumber] = _status;
+    }
+
+    function setPreSaleFundFCFSEachPreSaleNumberStatus(
+        uint256 _preSaleNumber,
+        bool _status
+    ) public onlyOwner {
+        preSaleFundFCFSEachPreSaleNumberStatus[_preSaleNumber] = _status;
+    }
+
+    function setPreSaleFundEachPreSaleNumberWithoutStakingStatus(
+        uint256 _preSaleNumber,
+        bool _status
+    ) public onlyOwner {
+        preSaleFundEachPreSaleNumberWithoutStakingStatus[
+            _preSaleNumber
+        ] = _status;
+    }
+
+    // this represents the token being staked on our platform
+    // this represents the curreny being used to pay for this pre-sale
+    function preSaleFundEachPreSaleNumber(
+        uint256 _amount,
+        address _token,
+        address _busdToken,
+        uint256 _preSaleNumber
+    ) public {
+        require(preSaleFundEachPreSaleNumberStatus[_preSaleNumber] == true);
+        require(stakingBalance[_token][msg.sender] >= (1500 * (10**18)));
+        require(getStakingLevel(msg.sender, _token) > 0);
+        require(totalAmountToCollectForThisPreSale[_preSaleNumber] > 0);
+        require(_amount > 0, "Amount must be more than 0");
+        require(
+            preSaleTokenIsAllowed(_busdToken),
+            "Token is currently not allowed"
+        );
+        require(
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] < totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+        require(
+            (totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] + _amount) <= totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+
+        uint256 allocatedPreSaleAmount = getAllocatedPreSaleAmount(
+            msg.sender,
+            _token,
+            _preSaleNumber
+        );
+        uint256 balance = (allocatedPreSaleAmount -
+            purchasedBalanceEachPreSale[_preSaleNumber][msg.sender]);
+        require(balance > 0);
+        require(_amount <= balance);
+        stakingTimeToWithdraw[msg.sender] = block.timestamp;
+
+        IERC20(_busdToken).transferFrom(msg.sender, address(this), _amount);
+        updateUniquePreSaleTokensPurchased(msg.sender, _preSaleNumber);
+        // how much worth user has purchased in this single pre-sale (amount is in busd)
+        purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] =
+            purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] +
+            _amount;
+        // totalPurchasedPreSaleTokensEachPreSale determines how many pre-sale tokens user will get in this pre-sale
+        totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] =
+            totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] +
+            (_amount * TIMESeachPreSale[_preSaleNumber]);
+        // how much Funds has been collected so far
+        collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] +
+            _amount;
+        totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] +
+            _amount;
+        totalCollectionOfPreSaleFundsAllTokens =
+            totalCollectionOfPreSaleFundsAllTokens +
+            _amount;
+    }
+
+    function preSaleFundFCFSEachPreSaleNumber(
+        uint256 _amount,
+        address _token,
+        address _busdToken,
+        uint256 _preSaleNumber
+    ) public {
+        require(preSaleFundFCFSEachPreSaleNumberStatus[_preSaleNumber] == true);
+        require(stakingBalance[_token][msg.sender] >= (1500 * (10**18)));
+        require(getStakingLevel(msg.sender, _token) > 0);
+        require(totalAmountToCollectForThisPreSale[_preSaleNumber] > 0);
+        require(_amount > 0, "Amount must be more than 0");
+        require(
+            preSaleTokenIsAllowed(_busdToken),
+            "Token is currently not allowed"
+        );
+        require(
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] < totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+        require(
+            (totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] + _amount) <= totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+
+        uint256 allocatedPreSaleAmount = getAllocatedPreSaleAmount(
+            msg.sender,
+            _token,
+            _preSaleNumber
+        );
+        require(allocatedPreSaleAmount > 0);
+        stakingTimeToWithdraw[msg.sender] = block.timestamp;
+
+        IERC20(_busdToken).transferFrom(msg.sender, address(this), _amount);
+        updateUniquePreSaleTokensPurchased(msg.sender, _preSaleNumber);
+        // how much worth user has purchased in this single pre-sale (amount is in busd)
+        purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] =
+            purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] +
+            _amount;
+        // totalPurchasedPreSaleTokensEachPreSale determines how many pre-sale tokens user will get in this pre-sale
+        totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] =
+            totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] +
+            (_amount * TIMESeachPreSale[_preSaleNumber]);
+        // how much Funds has been collected so far
+        collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] +
+            _amount;
+        totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] +
+            _amount;
+        totalCollectionOfPreSaleFundsAllTokens =
+            totalCollectionOfPreSaleFundsAllTokens +
+            _amount;
+    }
+
+    function preSaleFundEachPreSaleNumberWithoutStaking(
+        uint256 _amount,
+        address _token,
+        address _busdToken,
+        uint256 _preSaleNumber
+    ) public {
+        require(
+            preSaleFundEachPreSaleNumberWithoutStakingStatus[_preSaleNumber] ==
+                true
+        );
+        require(totalAmountToCollectForThisPreSale[_preSaleNumber] > 0);
+        require(_amount > 0, "Amount must be more than 0");
+        require(
+            preSaleTokenIsAllowed(_busdToken),
+            "Token is currently not allowed"
+        );
+        require(
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] < totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+        require(
+            (totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] + _amount) <= totalAmountToCollectForThisPreSale[_preSaleNumber]
+        );
+
+        stakingTimeToWithdraw[msg.sender] = block.timestamp;
+
+        IERC20(_busdToken).transferFrom(msg.sender, address(this), _amount);
+
+        updateUniquePreSaleTokensPurchased(msg.sender, _preSaleNumber);
+        // how much worth user has purchased in this single pre-sale (amount is in busd)
+        purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] =
+            purchasedBalanceEachPreSale[_preSaleNumber][msg.sender] +
+            _amount;
+        // totalPurchasedPreSaleTokensEachPreSale determines how many pre-sale tokens user will get in this pre-sale
+        totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] =
+            totalPurchasedPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] +
+            (_amount * TIMESeachPreSale[_preSaleNumber]);
+        // how much Funds has been collected so far
+        collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] +
+            _amount;
+        totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] =
+            totalCollectionOfPreSaleFundsEachPreSale[_preSaleNumber][
+                _busdToken
+            ] +
+            _amount;
+        totalCollectionOfPreSaleFundsAllTokens =
+            totalCollectionOfPreSaleFundsAllTokens +
+            _amount;
+    }
+
+    function getHowMuchMoreUserCanPurchaseEachPreSale(
+        address _sender,
+        address _token,
+        uint256 _preSaleNumber
+    ) public view returns (uint256) {
+        uint256 allocatedPreSaleAmount = getAllocatedPreSaleAmount(
+            _sender,
+            _token,
+            _preSaleNumber
+        );
+        uint256 balance = (allocatedPreSaleAmount -
+            purchasedBalanceEachPreSale[_preSaleNumber][_sender]);
+        return (balance);
+    }
+
+    function updateUniquePreSaleTokensPurchased(
+        address _user,
+        uint256 _preSaleNumber
+    ) internal {
+        if (purchasedBalanceEachPreSale[_preSaleNumber][_user] <= 0) {
+            uniquePreSaleTokensPurchased[_user] =
+                uniquePreSaleTokensPurchased[_user] +
+                1;
+            preSaleFundersEachPreSale[_preSaleNumber].push(_user);
+        }
+    }
+
+    function setClaimTokensEachPreSaleStatus(
+        uint256 _preSaleNumber,
+        bool _status
+    ) public onlyOwner {
+        claimTokensEachPreSaleStatus[_preSaleNumber] = _status;
+    }
+
+    function claimAllTokensEachPreSale(uint256 _preSaleNumber) public {
+        require(claimTokensEachPreSaleStatus[_preSaleNumber] == true);
+
+        uint256 totalPurchased = totalPurchasedPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][msg.sender];
+        uint256 totalWithdrawn = totalWithdrawnPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][msg.sender];
+        uint256 balance = (totalPurchased - totalWithdrawn);
+        uint256 allowedToWithdraw = (percentageWithdrawAllowedEachPreSale[
+            _preSaleNumber
+        ] * totalPurchased) / 100;
+        uint256 availableToWithdraw = (allowedToWithdraw - totalWithdrawn);
+
+        require(totalPurchased > 0);
+        require(availableToWithdraw > 0);
+        require(totalWithdrawn < totalPurchased);
+
+        IERC20(preSaleTokenAddressEachPreSale[_preSaleNumber]).transfer(
+            msg.sender,
+            availableToWithdraw
+        );
+        totalWithdrawnPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] =
+            totalWithdrawnPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] +
+            availableToWithdraw;
+    }
+
+    function claimTokensEachPreSale(uint256 _preSaleNumber, uint256 _amount)
+        public
+    {
+        require(claimTokensEachPreSaleStatus[_preSaleNumber] == true);
+
+        uint256 totalPurchased = totalPurchasedPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][msg.sender];
+        uint256 totalWithdrawn = totalWithdrawnPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][msg.sender];
+        uint256 balance = (totalPurchased - totalWithdrawn);
+        uint256 allowedToWithdraw = (percentageWithdrawAllowedEachPreSale[
+            _preSaleNumber
+        ] * totalPurchased) / 100;
+        uint256 availableToWithdraw = (allowedToWithdraw - totalWithdrawn);
+
+        require(availableToWithdraw > 0);
+        require(_amount <= availableToWithdraw);
+        require(totalWithdrawn < totalPurchased);
+        require(_amount > 0, "Amount must be more than 0");
+        require(
+            balance >= _amount,
+            "You don't have enough purchased tokens left!"
+        );
+        require((totalWithdrawn + _amount) < totalPurchased);
+
+        IERC20(preSaleTokenAddressEachPreSale[_preSaleNumber]).transfer(
+            msg.sender,
+            _amount
+        );
+        totalWithdrawnPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] =
+            totalWithdrawnPreSaleTokensEachPreSale[_preSaleNumber][msg.sender] +
+            _amount;
+    }
+
+    // this function increase the of percentage amount allowed to withdraw
+
+    function setPercentageWithdrawAllowedEachPreSale(
+        uint256 _preSaleNumber,
+        uint256 _percentageAmount
+    ) public onlyOwner {
+        // require(percentageWithdrawAllowedEachPreSale[_preSaleNumber] <= 101);
+        // require((percentageWithdrawAllowedEachPreSale[_preSaleNumber] + _percentageAmount) <= 101);
+        percentageWithdrawAllowedEachPreSale[_preSaleNumber] =
+            percentageWithdrawAllowedEachPreSale[_preSaleNumber] +
+            _percentageAmount;
+    }
+
+    // similar to "setPercentageWithdrawAllowedEachPreSale" but you can also decrease the value
+
+    function manuallySetPercentageWithdrawAllowedEachPreSale(
+        uint256 _preSaleNumber,
+        uint256 _percentageAmount
+    ) public onlyOwner {
+        // require(percentageWithdrawAllowedEachPreSale[_preSaleNumber] <= 101);
+        // require((percentageWithdrawAllowedEachPreSale[_preSaleNumber] + _percentageAmount) <= 101);
+        percentageWithdrawAllowedEachPreSale[
+            _preSaleNumber
+        ] = _percentageAmount;
+    }
+
+    function getAvailablePreSaleTokensToWithdrawEachPreSale(
+        address _token,
+        address _sender,
+        uint256 _preSaleNumber
+    ) public view returns (uint256) {
+        uint256 totalPurchased = totalPurchasedPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][_sender];
+        uint256 totalWithdrawn = totalWithdrawnPreSaleTokensEachPreSale[
+            _preSaleNumber
+        ][_sender];
+        uint256 allowedToWithdraw = (percentageWithdrawAllowedEachPreSale[
+            _preSaleNumber
+        ] * totalPurchased) / 100;
+        uint256 availableToWithdraw = (allowedToWithdraw - totalWithdrawn);
+
+        // preSaleTokensLeftToWithdraw[_token][msg.sender] = availableToWithdraw;
+        return availableToWithdraw;
+    }
+
+    // this is to withdraw the collected funds from each pre-sale
+
+    function withdrawCollectedFundEachPreSale(
+        uint256 _preSaleNumber,
+        address _busdToken
+    ) public onlyOwner {
+        // uint256 balance = purchasedBalance[_token][msg.sender];
+        // uint256 balance = (IERC20(_token).balanceOf(address(this)));
+        uint256 collectedFunds = collectedPreSaleFundsEachPreSale[
+            _preSaleNumber
+        ][_busdToken];
+        // require(balance > 0, "Staking balance cannot be 0");
+        IERC20(_busdToken).transfer(msg.sender, collectedFunds);
+
+        collectedPreSaleFundsEachPreSale[_preSaleNumber][_busdToken] = 0;
+    }
+
+    function updatePreSaleTokenAddressEachPreSale(
+        uint256 _preSaleNumber,
+        address _preSaleTokenAddress
+    ) public onlyOwner {
+        preSaleTokenAddressEachPreSale[_preSaleNumber] = IERC20(
+            _preSaleTokenAddress
+        );
+    }
+
+    function updateTimesEachPreSale(uint256 _preSaleNumber, uint256 _times)
+        public
+        onlyOwner
+    {
+        TIMESeachPreSale[_preSaleNumber] = _times;
+    }
+
+    // *************************************************
+
+    // ---------------------------------------
+
     // -------------------------------
     //    address[] public receivingAllowedTokens;
 
@@ -67,11 +771,6 @@ contract TokenFarm is Ownable {
 
     // 100 ETH 1:1 for every 1 ETH, we give 1 DappToken
     // 50 ETH and 50 DAI staked, and we want to give a reward of 1 DAPP / 1 DAI
-    constructor(address _dappTokenAddress, address _priceFeed) public {
-        dappToken = IERC20(_dappTokenAddress);
-        // owner = msg.sender;
-        priceFeedA = AggregatorV3Interface(_priceFeed);
-    }
 
     function getVersion() public view returns (uint256) {
         return priceFeedA.version();
@@ -109,13 +808,18 @@ contract TokenFarm is Ownable {
             1000000000000000000;
 
         updateUniquePreSaleTokensStaked(msg.sender, _token);
+
+        // how much worth user has purchased in busd
         purchasedBalance[_token][msg.sender] =
             purchasedBalance[_token][msg.sender] +
             _amount;
+
+        // totalPurchasedPreSaleTokens determines how many pre-sale tokens user will get
         totalPurchasedPreSaleTokens[msg.sender] =
             totalPurchasedPreSaleTokens[msg.sender] +
             (_amount * TIMES);
 
+        // how much amount has been calculated so far
         collectedPreSaleFunds[_token] = collectedPreSaleFunds[_token] + _amount;
         totalCollectionOfPreSaleFunds[_token] =
             totalCollectionOfPreSaleFunds[_token] +

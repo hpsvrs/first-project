@@ -80,12 +80,101 @@ def get_contract(contract_name):
     return contract
 
 
+def participate_in_pre_sale_allocation():
+    account = get_account()
+    token_farm = TokenFarm[-1]
+    dapp_token = DappToken[-1]
+    print(token_farm)
+    print(account)
+    preSaleAllocationStatus = token_farm.preSaleAllocationStatus(0)
+    print(f"preSaleAllocation Status: {preSaleAllocationStatus}")
+
+    # tx_preSaleAllocationStatus = token_farm.setPreSaleAllocationStatus(
+    #     0, True, {"from": account}
+    # )
+    # tx_preSaleAllocationStatus.wait(1)
+
+    preSaleAllocationStatus1 = token_farm.preSaleAllocationStatus(0)
+
+    print(f"preSaleAllocation Status After: {preSaleAllocationStatus1}")
+
+    totalAmountToCollectForThisPreSale = token_farm.totalAmountToCollectForThisPreSale()
+    formatted_totalAmountToCollectForThisPreSale = Web3.fromWei(
+        totalAmountToCollectForThisPreSale, "ether"
+    )
+
+    # tx_totalAmountToCollectForThisPreSale = (
+    #     token_farm.setTotalAmountToCollectForThisPreSale(
+    #         (100 * (10 ** 18)), {"from": account}
+    #     )
+    # )
+    # tx_totalAmountToCollectForThisPreSale.wait(1)
+
+    print(
+        f"totalAmountToCollectForThisPreSale: {formatted_totalAmountToCollectForThisPreSale}"
+    )
+
+    # tx_changePreSaleNumberStatus = token_farm.changePreSaleNumberStatus(
+    #     0, True, {"from": account}
+    # )
+    # tx_changePreSaleNumberStatus.wait(1)
+
+    preSaleNumberStatus = token_farm.preSaleNumberStatus(0)
+    print(f"preSaleNumberStatus: {preSaleNumberStatus}")
+
+    # tx_participateInPreSaleAllocation = token_farm.participateInPreSaleAllocation(
+    #     0, dapp_token.address, {"from": account}
+    # )
+    # tx_participateInPreSaleAllocation.wait(1)
+
+    tx_getStakingLevel = token_farm.getStakingLevel(account, dapp_token)
+    print(f"Staking Level: {tx_getStakingLevel}")
+    whenParticipatedThatLevel = token_farm.whenParticipatedThatLevel(account)
+    print(f"whenParticipatedThatLevel: {whenParticipatedThatLevel}")
+
+    get_allocated_pre_sale_amount = token_farm.getAllocatedPreSaleAmount(
+        account, dapp_token.address, 0, {"from": account}
+    )
+
+    formatted_get_allocated_pre_sale_amount = Web3.fromWei(
+        get_allocated_pre_sale_amount, "ether"
+    )
+    print(f"get_allocated_pre_sale_amount: {get_allocated_pre_sale_amount}")
+    print(
+        f"formatted_get_allocated_pre_sale_amount: {formatted_get_allocated_pre_sale_amount}"
+    )
+
+    # allPoolsTotalWeight = token_farm.allPoolsTotalWeight()
+    # print(f"allPoolsTotalWeight: {allPoolsTotalWeight}")
+
+    # amountAllocatedToEachShare = token_farm.amountAllocatedToEachShare()
+    # formatted_amountAllocatedToEachShare = Web3.fromWei(
+    #     amountAllocatedToEachShare, "ether"
+    # )
+    # print(f"amountAllocatedToEachShare: {formatted_amountAllocatedToEachShare}")
+
+    # allocatedAmountToEachUser = token_farm.allocatedAmountToEachUser()
+
+    # formatted_allocatedAmountToEachUser = Web3.fromWei(
+    #     allocatedAmountToEachUser, "ether"
+    # )
+    # print(f"allocatedAmountToEachUser: {formatted_allocatedAmountToEachUser}")
+
+    # staking_level_users_counter = token_farm.staking_level_users_counter()
+    # print(f"staking_level_users_counter: {staking_level_users_counter}")
+    # i = 0
+    # while i < 29:
+    #     stakingLevelUserCounter = token_farm.stakingLevelToWeight(i)
+    #     print(stakingLevelUserCounter)
+    #     i = i + 1
+
+
 def get_available_to_withdraw():
     account = get_account()
     contract = TokenFarm[-1]
     dappToken = DappToken[-1]
-    dai = get_contract("fau_token")
-    print(dai.address)
+    # dai = get_contract("fau_token")
+    # print(dai.address)
     print(contract)
     print(account)
     TIMES = 20
@@ -106,7 +195,7 @@ def get_available_to_withdraw():
     print(f"This is available to withdraw {formatted_available_to_withdraw}")
 
     tx_set_percentageOfTokensDelivered = (
-        contract.issuePreSaleTokensToWithdrawPercentage(50, {"from": account})
+        contract.issuePreSaleTokensToWithdrawPercentage(1, {"from": account})
     )
     tx_set_percentageOfTokensDelivered.wait(1)
 
@@ -115,6 +204,7 @@ def get_available_to_withdraw():
     )
     formatted_available_to_withdraw2 = Web3.fromWei(available_to_withdraw2, "ether")
     print(f"this is available to withdraw2 {formatted_available_to_withdraw2}")
+
     percentageWithdrawAllowed = contract.percentageWithdrawAllowed()
     print(f"How much percentage you can withdraw {percentageWithdrawAllowed}")
 

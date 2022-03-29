@@ -5,19 +5,30 @@ import ERC20 from "../chain-info/contracts/MockERC20.json"
 import networkMapping from "../chain-info/deployments/map.json"
 import { constants, utils } from "ethers"
 import { Contract } from "@ethersproject/contracts"
-import { useEffect, useState } from "react"
+import { createContext, useContext, useEffect, useState } from "react"
+import { MyContext } from "../components/Header2"
 
+// const MyContext = createContext('')
 
 export const usePreSale = (tokenAddress: string) => {
     //address
     // abi
     // chainId
+    const data = useContext(MyContext)
+    const { chainIdentity, tokenFarmContractAddress } = data
+
+    console.log('this is the value of context chainId in usePreSale: ' + data + ' Number ' + chainIdentity + ' TokenAddress ' + tokenFarmContractAddress)
+
+    useEffect(() => {
+        console.log('in usePreSale chainNumber and tokenFarmAddress changed.')
+    }, [chainIdentity, tokenFarmContractAddress])
+
     const { chainId } = useEthers()
     const { abi } = TokenFarm
 
-    const tokenFarmAddress = chainId ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero
+    // const tokenFarmAddress = tokenFarmContractAddress
     const tokenFarmInterface = new utils.Interface(abi)
-    const tokenFarmContract = new Contract(tokenFarmAddress, tokenFarmInterface)
+    const tokenFarmContract = new Contract(tokenFarmContractAddress, tokenFarmInterface)
 
     const erc20ABI = ERC20.abi
     const erc20Interface = new utils.Interface(erc20ABI)
@@ -31,7 +42,7 @@ export const usePreSale = (tokenAddress: string) => {
 
     const approveAndPreSale = (amount: string) => {
         setAmountForPreSale(amount)
-        return approveErc20Send(tokenFarmAddress, amount)
+        return approveErc20Send(tokenFarmContractAddress, amount)
     }
 
 

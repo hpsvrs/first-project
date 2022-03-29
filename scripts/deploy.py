@@ -36,6 +36,13 @@ def deploy_token_farm_and_dapp_token(front_end_update=False):
     set_times = token_farm.updateTimes(TIMES, {"from": account})
     set_times.wait(1)
 
+    TIMESeachPreSale = 1
+
+    set_times = token_farm.updateTimesEachPreSale(
+        0, TIMESeachPreSale, {"from": account}
+    )
+    set_times.wait(1)
+
     tx = dapp_token.transfer(
         token_farm.address, dapp_token.totalSupply() - KEPT_BALANCE, {"from": account}
     )
@@ -50,8 +57,8 @@ def deploy_token_farm_and_dapp_token(front_end_update=False):
     print("Pre Sale Token Address updated!")
 
     # dapp_token, weth_token, fau_token/dai
-    weth_token = get_contract("weth_token")
-    fau_token = get_contract("fau_token")
+    # weth_token = get_contract("weth_token")
+    # fau_token = get_contract("fau_token")
     dict_of_allowed_tokens = {
         dapp_token: dapp_token.address,
         # fau_token: get_contract("dai_usd_price_feed"),
@@ -61,12 +68,14 @@ def deploy_token_farm_and_dapp_token(front_end_update=False):
 
     dict_of_pre_sale_allowed_tokens = {
         dapp_token: dapp_token.address,
-        fau_token: get_contract("dai_usd_price_feed"),
-        weth_token: get_contract("eth_usd_price_feed"),
+        # fau_token: get_contract("dai_usd_price_feed"),
+        # weth_token: get_contract("eth_usd_price_feed"),
     }
     add_pre_sale_allowed_tokens(token_farm, dict_of_pre_sale_allowed_tokens, account)
     if front_end_update:
         update_front_end4()
+        update_front_end5()
+        # update_front_end6()
     return token_farm, dapp_token
 
 
@@ -137,6 +146,26 @@ def update_front_end4():
         with open("./front_end4/src/brownie-config.json", "w") as brownie_config_json:
             json.dump(config_dict, brownie_config_json)
     print("Front end updated!")
+
+
+def update_front_end5():
+    copy_folders_to_front_end("./build", "./front_end5/src/chain-info")
+
+    with open("brownie-config.yaml", "r") as brownie_config:
+        config_dict = yaml.load(brownie_config, Loader=yaml.FullLoader)
+        with open("./front_end5/src/brownie-config.json", "w") as brownie_config_json:
+            json.dump(config_dict, brownie_config_json)
+    print("Front end 5 updated!")
+
+
+# def update_front_end6():
+#     copy_folders_to_front_end("./build", "./front_end6/src/chain-info")
+
+#     with open("brownie-config.yaml", "r") as brownie_config:
+#         config_dict = yaml.load(brownie_config, Loader=yaml.FullLoader)
+#         with open("./front_end6/src/brownie-config.json", "w") as brownie_config_json:
+#             json.dump(config_dict, brownie_config_json)
+#     print("Front end 6 updated!")
 
 
 def main():

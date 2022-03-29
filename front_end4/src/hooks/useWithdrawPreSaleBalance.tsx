@@ -7,6 +7,8 @@ import { constants, utils } from "ethers"
 import { Contract } from "@ethersproject/contracts"
 import { useEffect, useState } from "react"
 import PreSale from "../chain-info/contracts/PreSale.json"
+import { useContext } from "react"
+import { MyContext } from "../components/Header2"
 
 
 
@@ -17,15 +19,19 @@ export const useWithdrawPreSaleBalance = () => {
     const { chainId } = useEthers()
     const { abi } = TokenFarm
 
-    const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
+    const data = useContext(MyContext)
+    const { chainIdentity, tokenFarmContractAddress: tokenFarmAddress } = data
+
+
+    // const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
     const tokenFarmInterface = new utils.Interface(abi)
     const tokenFarmContract = new Contract(tokenFarmAddress, tokenFarmInterface)
 
 
-    const preSaleAddress = chainId ? networkMapping[String(chainId)]["PreSale"][0] : constants.AddressZero
-    const preSaleAbi = PreSale.abi
-    const preSaleInterface = new utils.Interface(preSaleAbi)
-    const preSaleContract = new Contract(preSaleAddress, preSaleInterface)
+    // const preSaleAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["PreSale"][0] : constants.AddressZero) : constants.AddressZero)
+    // const preSaleAbi = PreSale.abi
+    // const preSaleInterface = new utils.Interface(preSaleAbi)
+    // const preSaleContract = new Contract(preSaleAddress, preSaleInterface)
 
     // return useContractFunction(tokenFarmContract, "unstakeTokens",
     //     { transactionName: "Unstake Tokens" })

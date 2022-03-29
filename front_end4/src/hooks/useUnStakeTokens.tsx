@@ -6,6 +6,8 @@ import networkMapping from "../chain-info/deployments/map.json"
 import { constants, utils } from "ethers"
 import { Contract } from "@ethersproject/contracts"
 // import { useEffect, useState } from "react"
+import { useContext } from "react"
+import { MyContext } from "../components/Header2"
 
 
 export const useUnStakeTokens = (tokenAddress: string) => {
@@ -15,7 +17,11 @@ export const useUnStakeTokens = (tokenAddress: string) => {
     const { chainId } = useEthers()
     const { abi } = TokenFarm
 
-    const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
+    const data = useContext(MyContext)
+    const { chainIdentity, tokenFarmContractAddress: tokenFarmAddress } = data
+
+
+    // const tokenFarmAddress = (chainId ? ((String(chainId) == '42') ? networkMapping[String(chainId)]["TokenFarm"][0] : constants.AddressZero) : constants.AddressZero)
     const tokenFarmInterface = new utils.Interface(abi)
     const tokenFarmContract = new Contract(tokenFarmAddress, tokenFarmInterface)
 

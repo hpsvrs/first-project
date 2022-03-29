@@ -57,6 +57,7 @@ export const PreSaleForm = ({ token }: StakeFormProps) => {
         return withdrawBalance(tokenAddress)
     }
 
+    const isWithdrawing = withdrawBalanceState.status === "Mining"
     const isMining = approveAndStakeErc20State.status === "Mining"
     const [showErc20ApprovalSuccess, setShowErc20ApprovalSuccess] = useState(false)
     const [showStakeTokensSuccess, setShowStakeTokensSuccess] = useState(false)

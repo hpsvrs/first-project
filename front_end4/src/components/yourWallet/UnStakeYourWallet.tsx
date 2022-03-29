@@ -8,6 +8,12 @@ import { WalletBalance } from "./WalletBalance";
 import { UnStakeForm } from "./UnStakeForm"
 import { makeStyles } from "@material-ui/core"
 import { CheckpointsPreSale } from "../CheckpointsPreSale";
+import { useEthers } from "@usedapp/core";
+
+import { GridTotalStaking } from "./GridTotalStaking";
+import { useContext } from "react";
+import { MyContext } from "../Header2";
+import { GridStakingUnstaking } from "./GridStakingUnstaking";
 
 const useStyles = makeStyles((theme) => ({
     tabContent: {
@@ -32,6 +38,12 @@ interface YourWalletProps {
 
 
 export const UnStakeYourWallet = ({ supportedTokens }: YourWalletProps) => {
+    const { dappTokenAddress } = useContext(MyContext)
+
+    const { account } = useEthers()
+    const isConnected = account !== undefined
+
+
     const [selectedTokenIndex, setSelectedTokenIndex] = useState<number>(0)
 
     const [number, setNumber] = useState<number>(0)
@@ -46,39 +58,53 @@ export const UnStakeYourWallet = ({ supportedTokens }: YourWalletProps) => {
     }
     const classes = useStyles()
     return (
-        <Box sx={{ mt: 4 }}>
-            {/* {(number < 25) ? (<Button onClick={(() => setNumber(number + 2))}>Less {number}</Button>) : (number >= 25 && number <= 30)
+        <>
+            <div>
+                <h1 className="section-heading">UnStake! Tokens</h1>
+                <GridTotalStaking tokenAddress={dappTokenAddress} />
+                <GridStakingUnstaking tokenAddress={dappTokenAddress} />
+            </div>
+            {(isConnected) ?
+                (
+                    <Box sx={{ mt: 4 }}>
+                        {/* {(number < 25) ? (<Button onClick={(() => setNumber(number + 2))}>Less {number}</Button>) : (number >= 25 && number <= 30)
                 ? (<Button onClick={changeNumber}>greater {number}</Button>) : (<Button onClick={changeNumber}>greatest {number}</Button>)}
             <Button onClick={changeNumber}>Click Here {number}</Button> */}
-            {/* <CheckpointsPreSale /> */}
+                        {/* <CheckpointsPreSale /> */}
 
-            <Box className={classes.box}>
-                <TabContext value={selectedTokenIndex.toString()} >
-                    <TabList onChange={handleChange} aria-label="stake form tabs">
-                        {supportedTokens.map((token, index) => {
+                        <Box className={classes.box}>
+                            <TabContext value={selectedTokenIndex.toString()} >
+                                <TabList onChange={handleChange} aria-label="stake form tabs">
+                                    {supportedTokens.map((token, index) => {
 
-                            return (
-                                <Tab label={token.name}
-                                    value={index.toString()}
-                                    key={index}>
+                                        return (
+                                            <Tab label={token.name}
+                                                value={index.toString()}
+                                                key={index}>
 
-                                </Tab>
-                            )
-                        })}
-                    </TabList>
-                    {supportedTokens.map((token, index) => {
-                        return (
-                            <TabPanel value={index.toString()} key={index}>
-                                <div className={classes.tabContent}>
-                                    <WalletBalance token={supportedTokens[selectedTokenIndex]} />
-                                    <UnStakeForm token={supportedTokens[selectedTokenIndex]} />
-                                </div>
-                            </TabPanel>
-                        )
-                    })}
+                                            </Tab>
+                                        )
+                                    })}
+                                </TabList>
+                                {supportedTokens.map((token, index) => {
+                                    return (
+                                        <TabPanel value={index.toString()} key={index}>
+                                            <div className={classes.tabContent}>
+                                                <WalletBalance token={supportedTokens[selectedTokenIndex]} />
+                                                <UnStakeForm token={supportedTokens[selectedTokenIndex]} />
+                                            </div>
+                                        </TabPanel>
+                                    )
+                                })}
 
-                </TabContext>
-            </Box>
-        </Box>
+                            </TabContext>
+                        </Box>
+                    </Box>
+                ) : (
+                    <h1 className="section-heading"> Connect to Wallet...</h1>
+                )}
+        </>
+
+
     )
 }
