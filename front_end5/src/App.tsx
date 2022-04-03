@@ -18,6 +18,7 @@ import { Button, Chip } from '@material-ui/core';
 import { InformationPage } from './components/InformationPage'
 import networkMapping from "./chain-info/deployments/map.json"
 import { constants } from "ethers"
+import { Footer } from './components/Footer';
 
 
 
@@ -73,8 +74,11 @@ function App() {
         <BrowserRouter>
           {/* <ResponsiveAppBar1 /> */}
           {/* <Header1 /> */}
+          <div className='header'>
+            <ResponsiveAppBar />
+          </div>
 
-          <ResponsiveAppBar />
+          <Footer />
           {/* <section>
             <Main elementNumber={numberMain} />
           </section> */}

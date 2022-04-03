@@ -23,6 +23,7 @@ import { constants } from "ethers"
 import networkMapping from "../chain-info/deployments/map.json"
 import { useGetStakingLevel } from '../hooks/useGetStakingLevel';
 import { formatUnits } from "@ethersproject/units"
+import { FollowUs } from './FollowUs';
 
 // export type ContextObj = {
 //     chainId: number
@@ -198,7 +199,7 @@ const ResponsiveAppBar = () => {
                                             component="div"
                                             sx={{ mr: 2, ml: 2, display: { xs: 'none', md: 'flex' } }}
                                         >
-                                            MoonPad
+                                            The Bulls Pad
                                         </Typography>
 
                                         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -249,7 +250,7 @@ const ResponsiveAppBar = () => {
                                             component="div"
                                             sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}
                                         >
-                                            MoonPad
+                                            The Bulls Pad
                                         </Typography>
                                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                                             {pages.map((page, index) => (
@@ -294,7 +295,7 @@ const ResponsiveAppBar = () => {
                         <div className='staking-level'>
                             <h4 className='under-header'>Staking Level: {fStakingLevel} </h4>
                         </div>
-                        <div className='account-hash'>
+                        <div className='account-number'>
                             <Box>{isConnected ? (
                                 <Button
                                     onClick={deactivate}>
@@ -322,6 +323,7 @@ const ResponsiveAppBar = () => {
                             )}</Box>
                         </div>
                     </div>
+                    <FollowUs />
                 </Box>
                 <section>
                     <Main elementNumber={numberMain} />
